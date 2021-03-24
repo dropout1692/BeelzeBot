@@ -22,6 +22,8 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
     @Autowired
     PrievanService prievanService;
 
+    private final String ABOUT_LINK = "https://github.com/dropout1692/BeelzeBot/tree/master";
+
     @Override
     public Class<MessageCreateEvent> getEventType() {
         return MessageCreateEvent.class;
@@ -37,6 +39,8 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 return executeChuck(message);
             case "!prievan":
                 return executePrievanList(message);
+            case "!about":
+                return executeAbout(message);
         }
 
         return Mono.empty();
@@ -64,6 +68,16 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .filter(msg -> msg.getContent().equalsIgnoreCase("!prievan"))
                 .flatMap(Message::getChannel)
                 .flatMap(channel -> channel.createMessage(helper.formMessage(events)))
+                .then();
+    }
+
+    private Mono<Void> executeAbout(Message message){
+
+        return Mono.just(message)
+                .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                .filter(msg -> msg.getContent().equalsIgnoreCase("!about"))
+                .flatMap(Message::getChannel)
+                .flatMap(channel -> channel.createMessage(ABOUT_LINK))
                 .then();
     }
 }
