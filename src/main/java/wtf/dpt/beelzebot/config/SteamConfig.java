@@ -8,4 +8,7 @@ public class SteamConfig {
 
     @Value("${steam.api.key}")
     private String token;
+
+    @Value("${discord.api.domain}")
+    private String domain;
 }
