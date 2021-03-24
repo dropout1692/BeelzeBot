@@ -32,7 +32,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
         final Message message = event.getMessage();
 
-        switch (message.getContent()){
+        switch (message.getContent()) {
             case "!chuck":
                 return executeChuck(message);
             case "!prievan":
@@ -42,7 +42,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
         return Mono.empty();
     }
 
-    private Mono<Void> executeChuck(Message message){
+    private Mono<Void> executeChuck(Message message) {
 
         ChuckJokeDTO jokeDTO = chuckService.getChuckJoke();
 
@@ -54,7 +54,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .then();
     }
 
-    private Mono<Void> executePrievanList(Message message){
+    private Mono<Void> executePrievanList(Message message) {
 
         List<PrievanEventDTO> events = prievanService.getEvents();
         PrievanHelper helper = new PrievanHelper();

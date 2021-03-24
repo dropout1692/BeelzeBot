@@ -8,14 +8,14 @@ import java.util.List;
 
 public class PrievanHelper {
 
-    public String formMessage(List<PrievanEventDTO> events){
+    public String formMessage(List<PrievanEventDTO> events) {
 
         StringBuilder stringBuilder = new StringBuilder();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_LOCAL_TIME;
 
         stringBuilder.append(String.format("The last %s events were:\n\n", PrievanService.LIST_LIMIT));
 
-        for(PrievanEventDTO event : events){
+        for (PrievanEventDTO event : events) {
             stringBuilder.append(String.format(" - %s %s %s at %s\n",
                     event.getUsername(),
                     event.getAction().getLabel(),

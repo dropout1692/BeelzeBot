@@ -23,7 +23,7 @@ public class DiscordConfig {
                 .login()
                 .block();
 
-        for(EventListener<T> listener : eventListeners) {
+        for (EventListener<T> listener : eventListeners) {
             client.on(listener.getEventType())
                     .flatMap(listener::execute)
                     .onErrorResume(listener::handleError)
