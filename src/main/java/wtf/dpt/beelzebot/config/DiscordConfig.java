@@ -11,9 +11,9 @@ import wtf.dpt.beelzebot.listeners.EventListener;
 import java.util.List;
 
 @Configuration
-public class BotConfiguration {
+public class DiscordConfig {
 
-    @Value("${token}")
+    @Value("${discord.api.key}")
     private String token;
 
     @Bean
