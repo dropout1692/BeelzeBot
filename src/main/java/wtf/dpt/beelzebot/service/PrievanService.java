@@ -1,10 +1,18 @@
 package wtf.dpt.beelzebot.service;
 
+import discord4j.core.event.domain.VoiceStateUpdateEvent;
+import discord4j.core.object.VoiceState;
+import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import org.springframework.stereotype.Service;
+import wtf.dpt.beelzebot.enums.PrievanAction;
 import wtf.dpt.beelzebot.model.PrievanEventDTO;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PrievanService {
@@ -25,5 +33,53 @@ public class PrievanService {
 
     public List<PrievanEventDTO> getEvents() {
         return prievanList;
+    }
+
+    public PrievanEventDTO determineEvent(VoiceStateUpdateEvent event) {
+
+        PrievanEventDTO dto = new PrievanEventDTO();
+
+        VoiceState currentState = event.getCurrent();
+        Optional<VoiceState> oldState = event.getOld();
+
+        dto.setTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+        //todo: resolve thread blocking
+        User user = currentState.getUser().block();
+        if (user != null) {
+            dto.setUsername(user.getUsername());
+        }
+
+        PrievanAction action = determineAction(currentState, oldState);
+        dto.setAction(action);
+
+        VoiceChannel channel = null;
+        switch (action) {
+            case JOIN:
+            case SWITCH:
+                channel = currentState.getChannel().block();
+                break;
+            case LEFT:
+                assert oldState.isPresent();
+                channel = oldState.get().getChannel().block();
+                break;
+        }
+
+        if (channel != null) {
+            dto.setChannel(channel.getName());
+        }
+
+        return dto;
+    }
+
+    private PrievanAction determineAction(VoiceState currentState, Optional<VoiceState> oldState) {
+
+        if (oldState.isEmpty()) {
+            return PrievanAction.JOIN;
+        } else if (currentState.getChannelId().isEmpty()) {
+            return PrievanAction.LEFT;
+        } else {
+            return PrievanAction.SWITCH;
+        }
     }
 }

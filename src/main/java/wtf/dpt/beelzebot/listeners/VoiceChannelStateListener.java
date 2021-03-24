@@ -26,21 +26,8 @@ public class VoiceChannelStateListener implements EventListener<VoiceStateUpdate
     @Override
     public Mono<Void> execute(VoiceStateUpdateEvent event) {
 
-        VoiceState currentState = event.getCurrent();
-//        Optional<VoiceState> oldState = event.getOld();
-
-        //todo: resolve thread blocking
-        String username = currentState.getUser().block().getUsername();
-        String channel = currentState.getChannel().block().getName(); //todo: fix null channel
-        LocalDateTime time = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        PrievanAction action = PrievanAction.JOIN;
-
-        prievanService.addEvent(new PrievanEventDTO(
-                username,
-                channel,
-                time,
-                action
-        ));
+        PrievanEventDTO eventDTO = prievanService.determineEvent(event);
+        prievanService.addEvent(eventDTO);
 
         return Mono.empty();
     }

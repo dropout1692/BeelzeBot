@@ -3,7 +3,8 @@ package wtf.dpt.beelzebot.enums;
 public enum PrievanAction {
 
     JOIN("joined"),
-    LEFT("left");
+    LEFT("left"),
+    SWITCH("switched to");
 
     public final String label;
 
