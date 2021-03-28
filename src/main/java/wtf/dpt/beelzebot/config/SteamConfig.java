@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Configuration;
 public class SteamConfig {
 
     @Value("${steam.api.key}")
-    @Getter private String token;
+    @Getter
+    private String token;
 
     @Value("${steam.api.domain}")
     private String domain;

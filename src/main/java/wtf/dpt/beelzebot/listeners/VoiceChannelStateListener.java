@@ -4,7 +4,7 @@ import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import wtf.dpt.beelzebot.model.PrievanEventDTO;
+import wtf.dpt.beelzebot.model.prievan.PrievanEventDTO;
 import wtf.dpt.beelzebot.service.PrievanService;
 
 @Service

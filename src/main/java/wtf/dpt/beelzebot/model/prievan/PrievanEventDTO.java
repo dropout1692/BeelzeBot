@@ -1,4 +1,4 @@
-package wtf.dpt.beelzebot.model;
+package wtf.dpt.beelzebot.model.prievan;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package wtf.dpt.beelzebot.model;
+package wtf.dpt.beelzebot.model.chuck;
 
 import lombok.Getter;
 import lombok.Setter;

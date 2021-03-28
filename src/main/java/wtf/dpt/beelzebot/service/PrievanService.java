@@ -6,7 +6,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import org.springframework.stereotype.Service;
 import wtf.dpt.beelzebot.enums.PrievanAction;
-import wtf.dpt.beelzebot.model.PrievanEventDTO;
+import wtf.dpt.beelzebot.model.prievan.PrievanEventDTO;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -51,7 +51,7 @@ public class PrievanService {
         }
 
         PrievanAction action = determineAction(currentState, oldState);
-        if(action == null) { //switch bug fix
+        if (action == null) { //switch bug fix
             return null;
         }
         dto.setAction(action);
@@ -82,9 +82,9 @@ public class PrievanService {
         } else if (currentState.getChannelId().isEmpty()) {
             return PrievanAction.LEFT;
         } else {
-            if(currentState.getChannelId().equals(oldState.get().getChannelId())) { //not an actual switch
+            if (currentState.getChannelId().equals(oldState.get().getChannelId())) { //not an actual switch
                 return null;
-            }else{
+            } else {
                 return PrievanAction.SWITCH;
             }
         }

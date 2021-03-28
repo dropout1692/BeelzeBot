@@ -6,10 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import wtf.dpt.beelzebot.helpers.PrievanHelper;
-import wtf.dpt.beelzebot.model.ChuckJokeDTO;
-import wtf.dpt.beelzebot.model.PrievanEventDTO;
+import wtf.dpt.beelzebot.model.chuck.ChuckJokeDTO;
+import wtf.dpt.beelzebot.model.prievan.PrievanEventDTO;
 import wtf.dpt.beelzebot.service.ChuckService;
 import wtf.dpt.beelzebot.service.PrievanService;
+import wtf.dpt.beelzebot.service.SteamService;
 
 import java.util.List;
 
@@ -21,6 +22,9 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
     @Autowired
     PrievanService prievanService;
+
+    @Autowired
+    SteamService steamService;
 
     private final String ABOUT_LINK = "https://github.com/dropout1692/BeelzeBot/tree/master";
 
@@ -34,13 +38,14 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
         final Message message = event.getMessage();
 
-        switch (message.getContent()) {
-            case "!chuck":
-                return executeChuck(message);
-            case "!prievan":
-                return executePrievanList(message);
-            case "!about":
-                return executeAbout(message);
+        if (message.getContent().startsWith("!chuck")) {
+            return executeChuck(message);
+        } else if (message.getContent().startsWith("!prievan")) {
+            return executePrievanList(message);
+        } else if (message.getContent().startsWith("!about")) {
+            return executeAbout(message);
+        } else if (message.getContent().startsWith("!steamapp")) {
+            return executeSteamApp(message);
         }
 
         return Mono.empty();
@@ -71,7 +76,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .then();
     }
 
-    private Mono<Void> executeAbout(Message message){
+    private Mono<Void> executeAbout(Message message) {
 
         return Mono.just(message)
                 .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
@@ -79,5 +84,20 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .flatMap(Message::getChannel)
                 .flatMap(channel -> channel.createMessage(ABOUT_LINK))
                 .then();
+    }
+
+    private Mono<Void> executeSteamApp(Message message) {
+
+        String name = message.getContent().replace("!steamapp", "").strip();
+
+        if (name.length() > 0) {
+            return Mono.just(message)
+                    .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                    .flatMap(Message::getChannel)
+                    .flatMap(channel -> channel.createMessage(steamService.findAppID(name)))
+                    .then();
+        } else {
+            return Mono.empty();
+        }
     }
 }
