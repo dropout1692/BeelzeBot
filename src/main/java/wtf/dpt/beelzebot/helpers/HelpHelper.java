@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public class HelpHelper {
 
-    private List<String> commands = List.of(
+    private final List<String> commands = List.of(
             "!help      - shows currently available commands",
             "!about     - links to GitHub/master",
             "!prievan   - shows last " + PrievanService.LIST_LIMIT + " voice channel events",
