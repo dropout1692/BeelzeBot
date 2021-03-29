@@ -51,7 +51,7 @@ public class PrievanService {
         }
 
         PrievanAction action = determineAction(currentState, oldState);
-        if(action == null) { //switch bug fix
+        if (action == null) { //switch bug fix
             return null;
         }
         dto.setAction(action);
@@ -82,9 +82,9 @@ public class PrievanService {
         } else if (currentState.getChannelId().isEmpty()) {
             return PrievanAction.LEFT;
         } else {
-            if(currentState.getChannelId().equals(oldState.get().getChannelId())) { //not an actual switch
+            if (currentState.getChannelId().equals(oldState.get().getChannelId())) { //not an actual switch
                 return null;
-            }else{
+            } else {
                 return PrievanAction.SWITCH;
             }
         }

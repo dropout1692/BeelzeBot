@@ -81,7 +81,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .then();
     }
 
-    private Mono<Void> executeAbout(Message message){
+    private Mono<Void> executeAbout(Message message) {
 
         return Mono.just(message)
                 .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
@@ -95,7 +95,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Currently available commands:\n");
-        for(String entry : helpHelper.getCommands()){
+        for (String entry : helpHelper.getCommands()) {
             stringBuilder.append(String.format("\t%s\n", entry));
         }
 
