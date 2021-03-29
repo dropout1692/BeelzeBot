@@ -2,6 +2,8 @@ package wtf.dpt.beelzebot.listeners;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -15,6 +17,8 @@ import java.util.List;
 
 @Service
 public class UserMessageListener implements EventListener<MessageCreateEvent> {
+
+    final static Logger log = LoggerFactory.getLogger(UserMessageListener.class);
 
     @Autowired
     ChuckService chuckService;
@@ -79,5 +83,11 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .flatMap(Message::getChannel)
                 .flatMap(channel -> channel.createMessage(ABOUT_LINK))
                 .then();
+    }
+
+    @Override
+    public Mono<Void> handleError(Throwable error) {
+        log.error("Unable to handle MessageCreateEvent! Attempting to continue..", error);
+        return Mono.empty();
     }
 }

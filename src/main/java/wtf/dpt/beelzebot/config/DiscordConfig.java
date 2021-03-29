@@ -27,6 +27,7 @@ public class DiscordConfig {
             client.on(listener.getEventType())
                     .flatMap(listener::execute)
                     .onErrorResume(listener::handleError)
+                    .retry()
                     .subscribe();
         }
 
