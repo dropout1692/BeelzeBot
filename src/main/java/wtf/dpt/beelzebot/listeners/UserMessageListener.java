@@ -12,6 +12,7 @@ import wtf.dpt.beelzebot.helpers.PrievanHelper;
 import wtf.dpt.beelzebot.model.ChuckJokeDTO;
 import wtf.dpt.beelzebot.model.PrievanEventDTO;
 import wtf.dpt.beelzebot.service.ChuckService;
+import wtf.dpt.beelzebot.service.NineGagService;
 import wtf.dpt.beelzebot.service.PrievanService;
 
 import java.util.List;
@@ -30,6 +31,9 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
     @Autowired
     HelpHelper helpHelper;
 
+    @Autowired
+    NineGagService nineGagService;
+
     private final String ABOUT_LINK = "https://github.com/dropout1692/BeelzeBot/tree/master";
 
     @Override
@@ -42,15 +46,16 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
         final Message message = event.getMessage();
 
-        switch (message.getContent()) {
-            case "!chuck":
-                return executeChuck(message);
-            case "!prievan":
-                return executePrievanList(message);
-            case "!about":
-                return executeAbout(message);
-            case "!help":
-                return executeHelp(message);
+        if (message.getContent().startsWith("!chuck")) {
+            return executeChuck(message);
+        } else if (message.getContent().startsWith("!prievan")) {
+            return executePrievanList(message);
+        } else if (message.getContent().startsWith("!about")) {
+            return executeAbout(message);
+        } else if (message.getContent().startsWith("!help")) {
+            return executeHelp(message);
+        } else if (message.getContent().startsWith("!9gag")) {
+            return execute9Gag(message);
         }
 
         return Mono.empty();
@@ -105,6 +110,23 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .flatMap(Message::getChannel)
                 .flatMap(channel -> channel.createMessage(stringBuilder.toString()))
                 .then();
+    }
+
+    private Mono<Void> execute9Gag(Message message) {
+
+        String url = message.getContent().replace("!9gag", "").strip();
+
+        if (url.length() > 0) {
+            return Mono.just(message)
+                    .filter(msg -> msg.getAuthor().isPresent())
+                    .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                    .flatMap(Message::getChannel)
+                    .flatMap(channel -> channel.createMessage(nineGagService.correct9GagLink(url, message)))
+                    .flatMap(Message::delete) //todo: works?
+                    .then();
+        } else {
+            return Mono.empty();
+        }
     }
 
     @Override
