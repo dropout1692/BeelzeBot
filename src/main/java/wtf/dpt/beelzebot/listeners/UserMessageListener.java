@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import wtf.dpt.beelzebot.helpers.HelpHelper;
 import wtf.dpt.beelzebot.helpers.PrievanHelper;
 import wtf.dpt.beelzebot.model.ChuckJokeDTO;
 import wtf.dpt.beelzebot.model.PrievanEventDTO;
@@ -25,6 +26,9 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
     @Autowired
     PrievanService prievanService;
+
+    @Autowired
+    HelpHelper helpHelper;
 
     private final String ABOUT_LINK = "https://github.com/dropout1692/BeelzeBot/tree/master";
 
@@ -45,6 +49,8 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 return executePrievanList(message);
             case "!about":
                 return executeAbout(message);
+            case "!help":
+                return executeHelp(message);
         }
 
         return Mono.empty();
@@ -82,6 +88,22 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .filter(msg -> msg.getContent().equalsIgnoreCase("!about"))
                 .flatMap(Message::getChannel)
                 .flatMap(channel -> channel.createMessage(ABOUT_LINK))
+                .then();
+    }
+
+    private Mono<Void> executeHelp(Message message) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Currently available commands:\n");
+        for(String entry : helpHelper.getCommands()){
+            stringBuilder.append(String.format("\t%s\n", entry));
+        }
+
+        return Mono.just(message)
+                .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                .filter(msg -> msg.getContent().equalsIgnoreCase("!help"))
+                .flatMap(Message::getChannel)
+                .flatMap(channel -> channel.createMessage(stringBuilder.toString()))
                 .then();
     }
 
