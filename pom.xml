@@ -10,7 +10,7 @@
     </parent>
     <groupId>wtf.dpt</groupId>
     <artifactId>beelzebot</artifactId>
-    <version>0.0.2-RELEASE</version>
+    <version>0.0.3-RELEASE</version>
     <name>BeelzeBot</name>
     <description>A Discord bot</description>
     <properties>
