@@ -10,7 +10,7 @@
     </parent>
     <groupId>wtf.dpt</groupId>
     <artifactId>beelzebot</artifactId>
-    <version>0.0.3-RELEASE</version>
+    <version>0.1.0-SNAPSHOT</version>
     <name>BeelzeBot</name>
     <description>A Discord bot</description>
     <properties>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.discord4j</groupId>
             <artifactId>discord4j-core</artifactId>
-            <version>3.1.3</version>
+            <version>3.1.4</version>
         </dependency>
 
         <dependency>
