@@ -1,5 +1,6 @@
 package wtf.dpt.beelzebot.service;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +18,14 @@ public class ChuckService {
     }
 
     public ChuckJokeDTO getChuckJoke() {
-        return restTemplate.getForObject(CHUCK_RANDOM_URL, ChuckJokeDTO.class);
+
+        ChuckJokeDTO dto = restTemplate.getForObject(CHUCK_RANDOM_URL, ChuckJokeDTO.class);
+
+        //unescape HTML entities like &quot;
+        if(dto != null && dto.getValue() != null){
+            dto.getValue().setJoke(StringEscapeUtils.unescapeHtml4(dto.getValue().getJoke()));
+        }
+
+        return dto;
     }
 }
