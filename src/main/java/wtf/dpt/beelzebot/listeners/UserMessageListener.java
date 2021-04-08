@@ -122,7 +122,6 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                     .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
                     .flatMap(Message::getChannel)
                     .flatMap(channel -> channel.createMessage(nineGagService.correct9GagLink(url, message)))
-                    .flatMap(Message::delete) //todo: works?
                     .then();
         } else {
             return Mono.empty();

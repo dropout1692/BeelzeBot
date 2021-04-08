@@ -5,6 +5,7 @@ import discord4j.core.object.entity.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 public class NineGagService {
@@ -15,21 +16,24 @@ public class NineGagService {
 
         Optional<User> user = message.getAuthor();
         assert user.isPresent();
-        String username = user.get().getUsername();
+        String userMention = user.get().getMention();
+
+        //todo: permissions need to be resolved
+        message.delete();
 
         String fixedUrl = (isVideo ? fixVideoLink(url) : fixPageLink(url));
 
-        return formResponse(username, fixedUrl);
+        return formResponse(userMention, fixedUrl);
     }
 
     private String formResponse(String username, String fixedUrl) {
 
-        return String.format("@%s posted the following meme:\n%s", username, fixedUrl);
+        return String.format("%s posted the following meme:\n%s", username, fixedUrl);
     }
 
     //todo:impl
     private String fixVideoLink(String url){
-        return "<funny link here soon>";
+        return url.replaceAll("\\.mp4", ".webm");
     }
 
     //todo:impl
@@ -38,6 +42,6 @@ public class NineGagService {
     }
 
     private boolean isVideoLink(String url){
-        return url.endsWith(".mp4"); //todo: improve?
+        return Pattern.matches("^.*(\\.mp4)$", url);
     }
 }
