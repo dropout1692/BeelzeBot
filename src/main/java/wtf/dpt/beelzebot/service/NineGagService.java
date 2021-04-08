@@ -33,7 +33,7 @@ public class NineGagService {
 
     //todo:impl
     private String fixVideoLink(String url){
-        return url.replaceAll("\\.mp4", ".webm");
+        return url.replaceAll("460svav1", "460svvp9");
     }
 
     //todo:impl
@@ -42,6 +42,6 @@ public class NineGagService {
     }
 
     private boolean isVideoLink(String url){
-        return Pattern.matches("^.*(\\.mp4)$", url);
+        return Pattern.matches("^.*(\\.webm|\\.mp4)$", url);
     }
 }
