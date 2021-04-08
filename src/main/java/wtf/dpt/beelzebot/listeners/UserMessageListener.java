@@ -1,5 +1,6 @@
 package wtf.dpt.beelzebot.listeners;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import org.slf4j.Logger;
@@ -122,6 +123,8 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                     .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
                     .flatMap(Message::getChannel)
                     .flatMap(channel -> channel.createMessage(nineGagService.correct9GagLink(url, message)))
+                    .then(Mono.just(message))
+                    .flatMap(Message::delete)
                     .then();
         } else {
             return Mono.empty();

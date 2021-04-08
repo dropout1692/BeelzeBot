@@ -18,9 +18,6 @@ public class NineGagService {
         assert user.isPresent();
         String userMention = user.get().getMention();
 
-        //todo: permissions need to be resolved
-        message.delete();
-
         String fixedUrl = (isVideo ? fixVideoLink(url) : fixPageLink(url));
 
         return formResponse(userMention, fixedUrl);
