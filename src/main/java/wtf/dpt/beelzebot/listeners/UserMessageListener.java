@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import wtf.dpt.beelzebot.helpers.BotHelper;
+import wtf.dpt.beelzebot.helpers.HelpHelper;
 import wtf.dpt.beelzebot.helpers.PrievanHelper;
 import wtf.dpt.beelzebot.model.ChuckJokeDTO;
 import wtf.dpt.beelzebot.model.PrievanEventDTO;
@@ -30,6 +30,11 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
     @Autowired
     BotHelper botHelper;
 
+    @Autowired
+    NineGagService nineGagService;
+
+    private final String ABOUT_LINK = "https://github.com/dropout1692/BeelzeBot/tree/master";
+
     @Override
     public Class<MessageCreateEvent> getEventType() {
         return MessageCreateEvent.class;
@@ -40,17 +45,18 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
         final Message message = event.getMessage();
 
-        switch (message.getContent()) {
-            case "!chuck":
-                return executeChuck(message);
-            case "!prievan":
-                return executePrievanList(message);
-            case "!about":
-                return executeLinkAbout(message);
-            case "!help":
-                return executeHelp(message);
-            case "!report":
-                return executeLinkIssues(message);
+        if (message.getContent().startsWith("!chuck")) {
+            return executeChuck(message);
+        } else if (message.getContent().startsWith("!prievan")) {
+            return executePrievanList(message);
+        } else if (message.getContent().startsWith("!about")) {
+            return executeAbout(message);
+        } else if (message.getContent().startsWith("!help")) {
+            return executeHelp(message);
+        } else if (message.getContent().startsWith("!9gag")) {
+            return execute9Gag(message);
+        }else if((message.getContent().startsWith("!report")){
+            return executeLinkIssues(message);
         }
 
         return Mono.empty();
@@ -81,7 +87,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .then();
     }
 
-    private Mono<Void> executeLinkAbout(Message message) {
+    private Mono<Void> executeAbout(Message message) {
 
         return Mono.just(message)
                 .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
@@ -109,7 +115,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Currently available commands:\n");
-        for (String entry : botHelper.getCommands()) {
+        for (String entry : helpHelper.getCommands()) {
             stringBuilder.append(String.format("\t%s\n", entry));
         }
 
@@ -119,6 +125,24 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .flatMap(Message::getChannel)
                 .flatMap(channel -> channel.createMessage(stringBuilder.toString()))
                 .then();
+    }
+
+    private Mono<Void> execute9Gag(Message message) {
+
+        String url = message.getContent().replace("!9gag", "").strip();
+
+        if (url.length() > 0) {
+            return Mono.just(message)
+                    .filter(msg -> msg.getAuthor().isPresent())
+                    .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                    .flatMap(Message::getChannel)
+                    .flatMap(channel -> channel.createMessage(nineGagService.correct9GagLink(url, message)))
+                    .then(Mono.just(message))
+                    .flatMap(Message::delete)
+                    .then();
+        } else {
+            return Mono.empty();
+        }
     }
 
     @Override
