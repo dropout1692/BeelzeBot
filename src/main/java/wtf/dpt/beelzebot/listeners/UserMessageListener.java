@@ -7,11 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import wtf.dpt.beelzebot.helpers.HelpHelper;
+import wtf.dpt.beelzebot.helpers.BotHelper;
 import wtf.dpt.beelzebot.helpers.PrievanHelper;
 import wtf.dpt.beelzebot.model.ChuckJokeDTO;
 import wtf.dpt.beelzebot.model.PrievanEventDTO;
 import wtf.dpt.beelzebot.service.ChuckService;
+import wtf.dpt.beelzebot.service.NineGagService;
 import wtf.dpt.beelzebot.service.PrievanService;
 
 import java.util.List;
@@ -33,8 +34,6 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
     @Autowired
     NineGagService nineGagService;
 
-    private final String ABOUT_LINK = "https://github.com/dropout1692/BeelzeBot/tree/master";
-
     @Override
     public Class<MessageCreateEvent> getEventType() {
         return MessageCreateEvent.class;
@@ -55,7 +54,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
             return executeHelp(message);
         } else if (message.getContent().startsWith("!9gag")) {
             return execute9Gag(message);
-        }else if((message.getContent().startsWith("!report")){
+        } else if (message.getContent().startsWith("!report")) {
             return executeLinkIssues(message);
         }
 
@@ -101,7 +100,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
         String issuesMessage = String.format(
                 "If you wish to report an issue or to suggest an improvement please refer to:\n%s",
-                    BotHelper.LINK_ISSUES);
+                BotHelper.LINK_ISSUES);
 
         return Mono.just(message)
                 .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
@@ -115,7 +114,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Currently available commands:\n");
-        for (String entry : helpHelper.getCommands()) {
+        for (String entry : botHelper.getCommands()) {
             stringBuilder.append(String.format("\t%s\n", entry));
         }
 
