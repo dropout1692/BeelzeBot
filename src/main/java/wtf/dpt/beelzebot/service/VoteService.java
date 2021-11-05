@@ -13,6 +13,9 @@ import java.util.List;
 @Service
 public class VoteService {
 
+    //todo: extract strings
+    //todo: vote valid options set
+
     @Getter
     private Poll currentPoll = null;
     private Poll previousPoll = null;
