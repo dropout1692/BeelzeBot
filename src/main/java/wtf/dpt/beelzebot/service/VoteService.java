@@ -23,30 +23,38 @@ public class VoteService {
 
     public String castPoll(Poll poll) {
 
-        if (this.currentPoll != null) {
-            return String.format("There already exists a poll by %s:\n\n%s",
-                    this.currentPoll.getCastBy(),
-                    getPollString()
-            );
+        if (poll.getQuestion().length() != 0) {
+
+            if (this.currentPoll != null) {
+                return String.format("There is an active poll already.\n%s",
+                        getPollString()
+                );
+            }
+
+            if (poll.getAnswers().size() < 2) {
+                return "Not enough options to vote on!";
+            }
+
+            this.currentPoll = poll;
+
+        } else {
+            if (this.currentPoll == null) {
+                return "There is no active poll.";
+            }
         }
 
-        if(poll.getAnswers().size()<2 && poll.getQuestion().length() > 0){
-            return "Not enough options to vote on!";
-        }
-
-        this.currentPoll = poll;
         return getPollString();
     }
 
     public String castVote(Message message) {
 
         String voteString = message.getContent().replace("!vote", "").strip();
-        if(!voteString.matches("\\d+")){
+        if (!voteString.matches("\\d+")) {
             return getVotingHelp();
         }
 
         int option = Integer.parseInt(voteString);
-        if (option - 1 > this.currentPoll.getAnswers().size() || option < 1) {
+        if (option - 1 > this.currentPoll.getAnswers().size() || option < 1 || option > this.currentPoll.getAnswers().size()) {
             return getVotingHelp();
         }
 
