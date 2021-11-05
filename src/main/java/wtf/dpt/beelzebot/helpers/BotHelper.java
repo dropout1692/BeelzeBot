@@ -19,6 +19,9 @@ public class BotHelper {
             "!about             - links to GitHub/master",
             "!prievan           - shows last " + PrievanService.LIST_LIMIT + " voice channel events",
             "!chuck             - posts a savage Chuck Norris joke",
-            "!9gag <link>       - extracts a meme from a 9gag link; if it's a video it gets embedded"
+            "!9gag <link>       - extracts a meme from a 9gag link; if it's a video it gets embedded",
+            "!play <link>       - plays a song from YouTube",
+            "!leave             - bot leaves the current channel",
+            "!vote <number>     - vote on the currently active poll"
     );
 }

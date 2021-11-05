@@ -1,7 +1,10 @@
 package wtf.dpt.beelzebot.listeners;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.VoiceState;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import wtf.dpt.beelzebot.model.PrievanEventDTO;
 import wtf.dpt.beelzebot.service.ChuckService;
 import wtf.dpt.beelzebot.service.NineGagService;
 import wtf.dpt.beelzebot.service.PrievanService;
+import wtf.dpt.beelzebot.service.VoteService;
 
 import java.util.List;
 
@@ -33,6 +37,9 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
 
     @Autowired
     NineGagService nineGagService;
+
+    @Autowired
+    VoteService voteService;
 
     @Override
     public Class<MessageCreateEvent> getEventType() {
@@ -56,6 +63,12 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
             return execute9Gag(message);
         } else if (message.getContent().startsWith("!report")) {
             return executeLinkIssues(message);
+        } else if (message.getContent().startsWith("!poll")) {
+            return executeCreatePoll(message);
+        } else if (message.getContent().startsWith("!vote")) {
+            return executePollVote(message);
+        } else if (message.getContent().startsWith("!endpoll")) {
+            return executeEndPoll(message);
         }
 
         return Mono.empty();
@@ -142,6 +155,46 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
         } else {
             return Mono.empty();
         }
+    }
+
+    private Mono<Void> executeCreatePoll(Message message) {
+
+        String userName = message.getUserData().username();
+
+            return Mono.just(message)
+                    .filter(msg -> msg.getAuthor().isPresent())
+                    .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                    .flatMap(Message::getChannel)
+                    .flatMap(channel -> channel.createMessage(voteService.castPoll(userName, message)))
+                    .then(Mono.just(message))
+                    .flatMap(Message::delete)
+                    .then();
+    }
+
+    private Mono<Void> executePollVote(Message message) {
+
+            return Mono.just(message)
+                    .filter(msg -> msg.getAuthor().isPresent())
+                    .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                    .flatMap(Message::getChannel)
+                    .flatMap(channel -> channel.createMessage(voteService.castVote(message)))
+                    .then(Mono.just(message))
+                    .flatMap(Message::delete)
+                    .then();
+    }
+
+    private Mono<Void> executeEndPoll(Message message) {
+
+        String userName = message.getUserData().username();
+
+        return Mono.just(message)
+                .filter(msg -> msg.getAuthor().isPresent())
+                .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                .flatMap(Message::getChannel)
+                .flatMap(channel -> channel.createMessage(voteService.endPoll(userName)))
+                .then(Mono.just(message))
+                .flatMap(Message::delete)
+                .then();
     }
 
     @Override
