@@ -107,7 +107,7 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                 .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
                 .filter(msg -> msg.getContent().equalsIgnoreCase("!about"))
                 .flatMap(Message::getChannel)
-                .flatMap(channel -> channel.createMessage(BotHelper.LINK_ABOUT))
+                .flatMap(channel -> channel.createMessage(BotHelper.getAbout()))
                 .then();
     }
 

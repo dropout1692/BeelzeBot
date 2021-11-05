@@ -10,8 +10,16 @@ import java.util.List;
 @Service
 public class BotHelper {
 
+    public static final String BOT_VERSION = "BeelzeBot v1.0.3";
     public static final String LINK_ABOUT = "https://github.com/dropout1692/BeelzeBot/tree/master";
     public static final String LINK_ISSUES = "https://github.com/dropout1692/BeelzeBot/issues";
+
+    public static String getAbout() {
+        return String.format("%s\n%s",
+                BOT_VERSION,
+                LINK_ABOUT
+        );
+    }
 
     private final List<String> commands = List.of(
             "!help              - shows currently available commands",
