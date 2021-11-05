@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.stereotype.Service;
 import wtf.dpt.beelzebot.model.Poll;
 import wtf.dpt.beelzebot.model.PollOption;
-import wtf.dpt.beelzebot.model.PollResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +21,7 @@ public class VoteService {
         return castPoll(parsePoll(userName, message));
     }
 
-    public String castPoll(Poll vote) {
+    public String castPoll(Poll poll) {
 
         if (this.currentPoll != null) {
             return String.format("There already exists a poll by %s:\n\n%s",
@@ -31,18 +30,27 @@ public class VoteService {
             );
         }
 
-        this.currentPoll = vote;
+        if(poll.getAnswers().size()<2 && poll.getQuestion().length() > 0){
+            return "Not enough options to vote on!";
+        }
+
+        this.currentPoll = poll;
         return getPollString();
     }
 
     public String castVote(Message message) {
 
-        int option = Integer.parseInt(message.getContent().replace("!vote", "").strip());
+        String voteString = message.getContent().replace("!vote", "").strip();
+        if(!voteString.matches("\\d+")){
+            return getVotingHelp();
+        }
+
+        int option = Integer.parseInt(voteString);
         if (option - 1 > this.currentPoll.getAnswers().size() || option < 1) {
             return getVotingHelp();
         }
 
-        this.currentPoll.getAnswers().get(option).addVote();
+        this.currentPoll.getAnswers().get(option - 1).addVote();
 
         return "Vote accepted! Use !poll to display the current poll.";
     }
@@ -66,7 +74,11 @@ public class VoteService {
     }
 
     public String printPreviousPoll() {
-        return "The previous poll was:\n\n" + getPollString(true);
+        if (this.previousPoll != null) {
+            return "The previous poll was:\n\n" + getPollString(true);
+        } else {
+            return "There was no poll yet.";
+        }
     }
 
     private String getPollString() {
@@ -91,7 +103,7 @@ public class VoteService {
 
         List<PollOption> pollOptions = poll.getAnswers();
         for (PollOption option : pollOptions) {
-            String voteNumber = (option.getVoteCount() == 1) ? "1 vote" : option.getVoteCount() + "votes";
+            String voteNumber = (option.getVoteCount() == 1) ? "1 vote" : option.getVoteCount() + " votes";
             response.append(String.format("%s - %s\n",
                     option.getVoteString(),
                     voteNumber
