@@ -15,6 +15,7 @@ public class VoteService {
 
     //todo: extract strings
     //todo: vote valid options set
+    //todo: enable/handle multi-polling && repeated votes
 
     @Getter
     private Poll currentPoll = null;
