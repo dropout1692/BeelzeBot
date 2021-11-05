@@ -21,7 +21,7 @@ public class Poll {
     public PollResult getResults() {
 
         this.answers = answers.stream()
-                .sorted(Comparator.comparing(PollOption::getVoteCount))
+                .sorted(Comparator.comparing(PollOption::getVoteCount).reversed())
                 .collect(Collectors.toList());
 
         List<String> answerStrings = new ArrayList<>();

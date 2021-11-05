@@ -69,6 +69,8 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
             return executePollVote(message);
         } else if (message.getContent().startsWith("!endpoll")) {
             return executeEndPoll(message);
+        } else if (message.getContent().startsWith("!prevpoll")) {
+            return executePrevPoll(message);
         }
 
         return Mono.empty();
@@ -181,6 +183,18 @@ public class UserMessageListener implements EventListener<MessageCreateEvent> {
                     .then(Mono.just(message))
                     .flatMap(Message::delete)
                     .then();
+    }
+
+    private Mono<Void> executePrevPoll(Message message) {
+
+        return Mono.just(message)
+                .filter(msg -> msg.getAuthor().isPresent())
+                .filter(msg -> msg.getAuthor().map(user -> !user.isBot()).orElse(false))
+                .flatMap(Message::getChannel)
+                .flatMap(channel -> channel.createMessage(voteService.printPreviousPoll()))
+                .then(Mono.just(message))
+                .flatMap(Message::delete)
+                .then();
     }
 
     private Mono<Void> executeEndPoll(Message message) {

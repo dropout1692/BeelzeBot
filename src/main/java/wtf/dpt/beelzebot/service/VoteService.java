@@ -84,7 +84,6 @@ public class VoteService {
             poll = this.currentPoll;
         }
 
-        PollResult currentState = poll.getResults();
         response.append(String.format("%s cast by %s\n\n",
                 poll.getQuestion(),
                 poll.getCastBy()
@@ -93,7 +92,7 @@ public class VoteService {
         List<PollOption> pollOptions = poll.getAnswers();
         for (PollOption option : pollOptions) {
             String voteNumber = (option.getVoteCount() == 1) ? "1 vote" : option.getVoteCount() + "votes";
-            response.append(String.format("%s - %s",
+            response.append(String.format("%s - %s\n",
                     option.getVoteString(),
                     voteNumber
             ));
