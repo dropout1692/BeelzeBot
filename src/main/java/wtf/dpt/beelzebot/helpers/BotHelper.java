@@ -1,6 +1,7 @@
 package wtf.dpt.beelzebot.helpers;
 
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import wtf.dpt.beelzebot.service.PrievanService;
 
@@ -10,7 +11,9 @@ import java.util.List;
 @Service
 public class BotHelper {
 
-    public static final String BOT_VERSION = "BeelzeBot v1.0.3";
+    @Value("${bot.version}")
+    public static String BOT_VERSION;
+
     public static final String LINK_ABOUT = "https://github.com/dropout1692/BeelzeBot/tree/master";
     public static final String LINK_ISSUES = "https://github.com/dropout1692/BeelzeBot/issues";
 
