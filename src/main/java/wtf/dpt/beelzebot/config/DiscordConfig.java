@@ -18,19 +18,28 @@ public class DiscordConfig {
 
     @Bean
     public <T extends Event> GatewayDiscordClient gatewayDiscordClient(List<EventListener<T>> eventListeners) {
-        GatewayDiscordClient client = DiscordClientBuilder.create(token)
-                .build()
-                .login()
-                .block();
+
+        GatewayDiscordClient client = spawnClient();
 
         for (EventListener<T> listener : eventListeners) {
-            client.on(listener.getEventType())
-                    .flatMap(listener::execute)
-                    .onErrorResume(listener::handleError)
-                    .retry()
-                    .subscribe();
+            if (client != null) {
+                client.on(listener.getEventType())
+                        .flatMap(listener::execute)
+                        .onErrorResume(listener::handleError)
+                        .retry()
+                        .subscribe();
+            } else {
+                client = spawnClient();
+            }
         }
 
         return client;
+    }
+
+    private GatewayDiscordClient spawnClient() {
+        return DiscordClientBuilder.create(token)
+                .build()
+                .login()
+                .block();
     }
 }
