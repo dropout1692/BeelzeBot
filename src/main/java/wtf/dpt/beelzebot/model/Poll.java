@@ -3,9 +3,7 @@ package wtf.dpt.beelzebot.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -17,6 +15,7 @@ public class Poll {
     private String castBy;
     private String endedBy;
     private List<String> usersThatVoted;
+    private Map<String, List<Integer>> votes = new HashMap<>();
 
     public PollResult getResults() {
 
@@ -69,5 +68,9 @@ public class Poll {
                 .filter(o -> o.getVoteCount() == highest)
                 .map(PollOption::getVoteString)
                 .collect(Collectors.joining(", "));
+    }
+
+    public boolean alreadyVoted(String userID){
+        return this.getVotes().containsKey(userID);
     }
 }

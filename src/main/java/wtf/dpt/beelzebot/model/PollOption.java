@@ -16,4 +16,8 @@ public class PollOption {
     public void addVote(){
         voteCount++;
     }
+
+    public void removeVote(){
+        voteCount--;
+    }
 }

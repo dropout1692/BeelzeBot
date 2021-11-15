@@ -9,6 +9,7 @@ import wtf.dpt.beelzebot.model.PollOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VoteService {
@@ -52,19 +53,42 @@ public class VoteService {
 
     public String castVote(Message message) {
 
+        if (this.currentPoll == null) {
+            return "There is no active poll.";
+        }
+
+        String username = message.getUserData().username();
+        String userID = message.getUserData().id().asString();
+
         String voteString = message.getContent().replace("!vote", "").strip();
-        if (!voteString.matches("\\d+")) {
+        if (!voteString.matches("(\\d+\\s)+")) {
             return getVotingHelp();
         }
 
-        int option = Integer.parseInt(voteString);
-        if (option - 1 > this.currentPoll.getAnswers().size() || option < 1 || option > this.currentPoll.getAnswers().size()) {
-            return getVotingHelp();
+        List<Integer> newVotes = Arrays.stream(voteString.split("\\s"))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+
+        if (this.currentPoll.alreadyVoted(userID)) {
+
+            List<Integer> oldVotes = this.currentPoll.getVotes().get(userID);
+            for (int vote : oldVotes) {
+                this.currentPoll.getAnswers().get(vote - 1).removeVote();
+            }
         }
 
-        this.currentPoll.getAnswers().get(option - 1).addVote();
+        for (int vote : newVotes) {
 
-        return "Vote accepted! Use !poll to display the current poll.";
+            if (vote - 1 > this.currentPoll.getAnswers().size() || vote < 1 || vote > this.currentPoll.getAnswers().size()) {
+                return getVotingHelp();
+            }
+
+            this.currentPoll.getAnswers().get(vote - 1).addVote();
+        }
+
+        return String.format("Vote accepted from %s! Use !poll to display the current poll.",
+                username
+        );
     }
 
     public String endPoll(String userName) {
